@@ -1,0 +1,51 @@
+create database 1bm21cs030_Insurence;
+use 1bm21cs030_Insurence;
+
+
+create table Persons(
+driver_id varchar(10) primary key,
+_Name varchar(20),
+address varchar(30)
+);
+
+
+create table  Car(
+reg_num varchar(10) primary key,
+model varchar(10),
+_Year int
+);
+
+
+create table owns(
+driver_id varchar(10),
+reg_num varchar(20),
+primary key(driver_id,reg_num),
+foreign key(driver_id) references Persons(driver_id) on delete cascade on update cascade,
+foreign key(reg_num) references Car(reg_num) on delete cascade on update cascade
+);
+
+
+create table accident(
+report_num int primary key,
+accident_date date,
+location varchar(20)
+);
+
+
+create table participated(
+driver_id varchar(10) ,
+reg_num varchar(10) ,
+report_num int,
+damage_amount int,
+primary key(driver_id,reg_num,report_num),
+foreign key(driver_id) references Persons(driver_id) on delete cascade on update cascade,
+foreign key(reg_num) references Car(reg_num) on delete cascade on update cascade
+);
+
+insert into Persons values ('A01','Richard','Srinivas nagar');
+insert into Persons values ('A02','Pradeep','Rajaji nagar');
+insert into Persons values ('A03','Smith','Ashok nagar');
+insert into Persons values ('A04','Venu','N R Colony');
+insert into Persons values ('A05','Jhon','Hanumanth nagar');
+
+select * from Persons;
