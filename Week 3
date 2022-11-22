@@ -1,0 +1,87 @@
+create database Bank;
+use Bank;
+
+create table Branch(
+branch_name varchar(30) primary key,
+branch_city varchar(20),
+assets int
+);
+
+create table Bank_account(
+accno int,
+branch_name varchar(30),
+balance int,
+primary key(accno,branch_name),
+foreign key (branch_name) references Branch(branch_name)
+);
+
+create table Bank_customer(
+customer_name varchar(20),
+customer_street varchar(20),
+customer_city varchar(20),
+primary key (customer_name)
+);
+
+create table depositor(
+customer_name varchar(20),
+accno int,
+primary key (customer_name,accno),
+foreign key (customer_name) references Bank_customer(customer_name),
+foreign key (accno) references Bank_account(accno)
+);
+
+create table loan(
+loan_num int,
+branch_name varchar(30), 
+amount int,
+primary key(loan_num,branch_name),
+foreign key (branch_name) references Branch(branch_name)
+);
+
+insert into branch values ('SBI_Chamrajpet','Bengaluru',50000);
+insert into branch values ('SBI_ResidencyRoaad','Bengaluru',10000);
+insert into branch values ('SBI_ShivajiRoad','Bombay',20000);
+insert into branch values ('SBI_ParliamentaryRoad','Delhi',10000);
+insert into branch values ('SBI_Jantarmantar','Delhi',20000);
+
+insert into Bank_account values (1,'SBI_Chamrajpet',2000);
+insert into Bank_account values (2,'SBI_ResidencyRoaad',5000);
+insert into Bank_account values (3,'SBI_ShivajiRoad',6000);
+insert into Bank_account values (4,'SBI_ParliamentaryRoad',9000);
+insert into Bank_account values (5,'SBI_Jantarmantar',8000);
+insert into Bank_account values (6,'SBI_ShivajiRoad',4000);
+insert into Bank_account values (8,'SBI_ResidencyRoaad',4000);
+insert into Bank_account values (9,'SBI_ParliamentaryRoad',3000);
+insert into Bank_account values (10,'SBI_ResidencyRoaad',5000);
+insert into Bank_account values (11,'SBI_Jantarmantar',2000);
+
+insert into Depositor values ('Avinash',1);
+insert into Depositor values ('Dinesh',2);
+insert into Depositor values ('Nikil',4);
+insert into Depositor values ('Ravi',5);
+insert into Depositor values ('Avinash',8);
+insert into Depositor values ('Nikil',9);
+insert into Depositor values ('Dinesh',10);
+insert into Depositor values ('Nikil',11);
+
+insert into Bank_customer values ('Avinash','Bull_Temple_Road','Bangalore');
+insert into Bank_customer values ('Dinesh','Bannergatta_Road','Bangalore');
+insert into Bank_customer values ('Mohan','NationalCollege_Road','Bangalore');
+insert into Bank_customer values ('Nikil','Akbar_Road','Delhi');
+insert into Bank_customer values ('Ravi','Prithviraj_Road','Delhi');
+
+insert into Loan values (1,'SBI_Chamrajpet',1000);
+insert into Loan values (2,'SBI_ResidencyRoaad',2000);
+insert into Loan values (3,'SBI_ShivajiRoad',3000);
+insert into Loan values (4,'SBI_ParliamentaryRoad',4000);
+insert into Loan values (5,'SBI_Jantarmantar',5000);
+
+create view info(Bramch_name,assets_inLakhs) as select branch_name,assets/100000 from Branch; 
+select * from info;
+
+select customer_name from depositor where accno in (select accno from bank_account where branch_name like '%Resi%') group by customer_name having count(customer_name)>=2 ;
+
+create view branc(branch_name,total_loan) as select branch_name,sum(amount) from loan group by branch_name;
+select * from branc;
+
+select bc.customer_name,CONCAT(balance+1000,'  rupees') UPDATED_BALANCE from Bank_Account b, Bank_Customer bc, Depositor d where bc.customer_name=d.customer_name and b.accno=d.accno and bc.customer_city='Bangalore';
