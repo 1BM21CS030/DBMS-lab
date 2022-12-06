@@ -1,0 +1,91 @@
+create database employee;
+use employee;
+
+create table project(
+p_no int primary key,
+p_loc varchar(30),
+p_name varchar(30)
+);
+
+create table department(
+dep_no int primary key,
+dep_loc varchar(30),
+dep_name varchar(30)
+);
+
+create table employee(
+emp_no int,
+emp_name varchar(30),
+mgr_no int,
+hire_date date,
+sal float,
+dep_no int,
+primary key(emp_no),
+foreign key(dep_no) references department(dep_no) on update cascade on delete cascade
+);
+
+create table incentives(
+emp_no int,
+incentive_date date,
+incentive_amount float,
+primary key(incentive_date,emp_no),
+foreign key(emp_no) references employee(emp_no) on update cascade on delete cascade
+);
+
+create table assigned_to(
+emp_no int,
+p_no int,
+job_role varchar(30),
+primary key(emp_no,p_no),
+foreign key(emp_no) references employee(emp_no)on update cascade on delete cascade,
+foreign key(p_no) references project(p_no)on update cascade on delete cascade
+);
+
+insert into project values (1,'Bengaluru','one');
+insert into project values(2,'Mysuru','two');
+insert into project values(3,'hydrabad','three');
+insert into project values(4,'Chennai','four');
+insert into project values(5,'Cochin','five');
+
+insert into department values (11,'Bengaluru','account');
+insert into department values(12,'Mysuru','development');
+insert into department values(13,'hydrabad','HR');
+insert into department values(14,'Chennai','Hiring');
+insert into department values(15,'Cochin','Administration');
+
+insert into employee values (111,'luffy',112,'1999-01-01',100000,15);
+insert into employee values(112,'nami',113,'2000-03-02',124000,11);
+insert into employee values(113,'robin',111,'2005-02-09',123456,13);
+insert into employee values(114,'sanji',111,'2004-07-12',900000,12);
+insert into employee values(115,'chopper',114,'2003-12-12',50,14);
+insert into employee values(116,'kaido',114,'2002-02-19',5000000,11);
+insert into employee values(117,'brook',111,'1967-07-29',5000,11);
+
+insert into incentives values (111,'2014-12-12',10000);
+insert into incentives values (112,'2012-02-02',10000);
+insert into incentives values (113,'2017-11-11',10000);
+insert into incentives values (114,'2014-03-23',10000);
+insert into incentives values (116,'2014-10-10',90000);
+insert into incentives values (117,'2020-12-07',5000);
+
+insert into assigned_to values (111,2,'ceo');
+insert into assigned_to values (112,1,'navigator');
+insert into assigned_to values (113,4,'researcher');
+insert into assigned_to values (114,3,'cook');
+insert into assigned_to values (115,5,'doctor');
+insert into assigned_to values (116,2,'coo');
+insert into assigned_to values (117,1,'musician');
+
+select distinct a.emp_no from assigned_to a, project p where a.p_no=p.p_no and p.p_no in
+(select p_no from project where p_loc='Bengaluru' or p_loc='Mysuru'or p_loc='hydrabad');
+
+select emp_no from employee where emp_no not in
+(select emp_no from incentives);
+
+select e.emp_name,e.emp_no,e.dep_no,a.job_role,d.dep_loc from
+project p, assigned_to a, employee e, department d where
+ a.emp_no=e.emp_no and a.p_no=p.p_no and d.dep_no=e.dep_no and p.p_loc=d.dep_loc;
+ 
+select e.emp_name,d.dep_name,a.job_role from employee e inner join assigned_to a on a.emp_no=e.emp_no inner join department d on d.dep_no=e.dep_no
+where e.emp_no in (select emp_no from incentives where incentive_date between '2014-01-01' and '2014-12-31' and incentive_amount in
+(select max(incentive_amount) from incentives ));
